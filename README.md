@@ -231,6 +231,11 @@ On Linux, you can check your CCID version with the following command, and if req
 grep -A 1 CFBundleShortVersionString /usr/lib/pcsc/drivers/ifd-ccid.bundle/Contents/Info.plist
 ```
 
+## Windows Build
+* Install Newer version CMake GUI
+* Install [libUSB binrary](https://sourceforge.net/projects/libusb-win32/) to C:\Program Files\libusb-win32
+* Open CMake GUI to generate project
+
 Proprietary Notes
 =================
 FeliCa is a registered trademark of the Sony Corporation.
