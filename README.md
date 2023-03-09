@@ -237,7 +237,7 @@ grep -A 1 CFBundleShortVersionString /usr/lib/pcsc/drivers/ifd-ccid.bundle/Conte
 * Open CMake GUI to generate project
 * 安裝此處提供的原始 ACR 122U 驅動程序：https://www.acs.com.hk/en/driver/3/acr122u-usb-nfc-reader/
 * 下載 libusbk：https://sourceforge.net/projects/libusbk/
-![image](https://user-images.githubusercontent.com/7022841/223903673-1a8d3bcf-8912-4a5c-8f99-f0082a727b0c.png)
+* ![image](https://user-images.githubusercontent.com/7022841/223903673-1a8d3bcf-8912-4a5c-8f99-f0082a727b0c.png)
 
 Proprietary Notes
 =================
