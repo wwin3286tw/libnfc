@@ -1,4 +1,5 @@
 SET(EXAMPLES-SOURCES
+  nfc-mfreadsector
   nfc-anticol
   nfc-dep-initiator
   nfc-dep-target
