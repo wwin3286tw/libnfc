@@ -10,7 +10,7 @@
 
 void read_keys_from_file(const char* filename, uint8_t keys[MAX_KEYS][6], size_t* num_keys);
 void print_usage(char* argv[]);
-void authenticate_and_read_block(nfc_device* device, nfc_modulation nm, nfc_context* context, uint8_t block_number, char key_type, uint8_t keys[][6], size_t num_keys, int quiet_mode);
+void authenticate_and_read_block(nfc_device* device, nfc_modulation nm, nfc_context* context, uint8_t block_number, char key_type, uint8_t keys[][6], size_t num_keys, int quiet_mode, int msg_level);
 
 int main(int argc, char* argv[]) {
     nfc_device* device = NULL;
@@ -25,7 +25,7 @@ int main(int argc, char* argv[]) {
     uint8_t keys[MAX_KEYS][6];
     size_t num_keys = 0;
     int quiet_mode = 0, dump_all = 0;
-
+    int msg_level = 0;
     static struct option long_options[] = {
         {"block_number", required_argument, 0, 'b'},
         {"key_type", required_argument, 0, 't'},
@@ -33,11 +33,12 @@ int main(int argc, char* argv[]) {
         {"key_file", required_argument, 0, 'f'},
         {"quiet_mode", no_argument, 0, 'q'},
         {"dump_all", no_argument, 0, 'd'},
+       {"msg_level", required_argument, 0, 'm'},
         {0, 0, 0, 0}
     };
 
     int option_index = 0;
-    while ((opt = getopt_long(argc, argv, "b:t:k:f:qd", long_options, &option_index)) != -1) {
+    while ((opt = getopt_long(argc, argv, "b:t:k:f:qdm", long_options, &option_index)) != -1) {
         switch (opt) {
         case 'b':
             block_number = atoi(optarg);
@@ -57,11 +58,15 @@ int main(int argc, char* argv[]) {
         case 'd':
             dump_all = 1;
             break;
+        case 'm':
+            msg_level = atoi(optarg);
+            break;
         default:
             print_usage(argv);
             exit(EXIT_FAILURE);
         }
     }
+
 
     if (!key_text && !key_file) {
         printf("Error: No key specified. Please provide a key using --key_text or --key_file option.\n");
@@ -69,6 +74,10 @@ int main(int argc, char* argv[]) {
         exit(EXIT_FAILURE);
     }
     if (block_number && dump_all) {
+        printf("Error: Both block_number and dump_all are provided. Please choose only one option.\n");
+        exit(EXIT_FAILURE);
+    }
+    if (!block_number && !dump_all) {
         printf("Error: Both block_number and dump_all are provided. Please choose only one option.\n");
         exit(EXIT_FAILURE);
     }
@@ -122,11 +131,11 @@ int main(int argc, char* argv[]) {
 
     if (dump_all) {
         for (int current_block = 0; current_block < 64; current_block++) {
-            authenticate_and_read_block(device, nm, context, current_block, key_type, keys, num_keys, quiet_mode);
+            authenticate_and_read_block(device, nm, context, current_block, key_type, keys, num_keys, quiet_mode, msg_level);
         }
     }
     else {
-        authenticate_and_read_block(device, nm, context, block_number, key_type, keys, num_keys, quiet_mode);
+        authenticate_and_read_block(device, nm, context, block_number, key_type, keys, num_keys, quiet_mode, msg_level);
     }
 
     nfc_close(device);
@@ -155,10 +164,10 @@ void read_keys_from_file(const char* filename, uint8_t keys[MAX_KEYS][6], size_t
 }
 
 void print_usage(char* argv[]) {
-    printf("Usage: %s --block_number BLOCK_NUMBER --key_type KEY_TYPE [--key_text KEY_TEXT | --key_file KEY_FILE] [--quiet_mode] [--dump_all]\n", argv[0]);
+    printf("Usage: %s --block_number BLOCK_NUMBER --key_type KEY_TYPE [--key_text KEY_TEXT | --key_file KEY_FILE] [--quiet_mode] [--dump_all] [--msg_level LEVEL]\n", argv[0]);
 }
 
-void authenticate_and_read_block(nfc_device* device, nfc_modulation nm, nfc_context* context, uint8_t block_number, char key_type, uint8_t keys[][6], size_t num_keys, int quiet_mode) {
+void authenticate_and_read_block(nfc_device* device, nfc_modulation nm, nfc_context* context, uint8_t block_number, char key_type, uint8_t keys[][6], size_t num_keys, int quiet_mode,int msg_level) {
     nfc_target target;
     bool authenticated = false;
     for (size_t i = 0; i < num_keys; ++i) {
@@ -166,7 +175,7 @@ void authenticate_and_read_block(nfc_device* device, nfc_modulation nm, nfc_cont
         mifare_param mp_auth;
         memcpy(mp_auth.mpa.abtKey, keys[i], 6);
         memcpy(mp_auth.mpa.abtAuthUid, target.nti.nai.abtUid, 4);
-        if (quiet_mode == 0){
+        if (quiet_mode == 0 && msg_level == 0) {
             printf("key #%zu: %02x%02x%02x%02x%02x%02x\n", i + 1, keys[i][0], keys[i][1], keys[i][2], keys[i][3], keys[i][4], keys[i][5]);
         }
         if (key_type == 'A') {
