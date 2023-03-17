@@ -92,7 +92,7 @@ int main(int argc, char* argv[]) {
     else {
         read_keys_from_file(key_file, keys, &num_keys);
     }
-
+    
     nfc_init(&context);
     if (context == NULL) {
         printf("Unable to init libnfc (malloc)\n");
@@ -128,10 +128,11 @@ int main(int argc, char* argv[]) {
 
     bool authenticated = false;
     for (size_t i = 0; i < num_keys; ++i) {
+        nfc_initiator_select_passive_target(device, nm, NULL, 0, &target);
         mifare_param mp_auth;
         memcpy(mp_auth.mpa.abtKey, keys[i], 6);
         memcpy(mp_auth.mpa.abtAuthUid, target.nti.nai.abtUid, 4);
-
+        printf("Trying key #%zu: %02x%02x%02x%02x%02x%02x\n", i + 1, keys[i][0], keys[i][1], keys[i][2], keys[i][3], keys[i][4], keys[i][5]);
         if (key_type == 'A') {
             if (nfc_initiator_mifare_cmd(device, MC_AUTH_A, block_number, &mp_auth)) {
                 authenticated = true;
@@ -148,6 +149,7 @@ int main(int argc, char* argv[]) {
             printf("Error: Invalid key type. Valid options are 'A' or 'B'.\n");
             exit(EXIT_FAILURE);
         }
+        
     }
 
     if (!authenticated) {
