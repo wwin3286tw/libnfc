@@ -29,8 +29,9 @@ FOREACH(source ${EXAMPLES-SOURCES})
     SET(RC_FILE_TYPE 0x00000001L)
     CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/../contrib/win32/version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/../windows/${source}.rc @ONLY)
     LIST(APPEND TARGETS ${CMAKE_CURRENT_BINARY_DIR}/../windows/${source}.rc)
-	
-	  
+	IF(${source} MATCHES "nfc-mfreadblock")
+	  LIST(APPEND TARGETS mifare getopt )
+    ENDIF()
 	IF(${source} MATCHES "nfc-st25tb")
 		LIST(APPEND TARGETS ${CMAKE_CURRENT_SOURCE_DIR}/../contrib/win32/getopt.c)
 	ENDIF()
