@@ -1,5 +1,5 @@
 SET(EXAMPLES-SOURCES
-  nfc-mfreadblock
+  nfc-mfblock
   nfc-anticol
   nfc-dep-initiator
   nfc-dep-target
@@ -29,7 +29,7 @@ FOREACH(source ${EXAMPLES-SOURCES})
     SET(RC_FILE_TYPE 0x00000001L)
     CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/../contrib/win32/version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/../windows/${source}.rc @ONLY)
     LIST(APPEND TARGETS ${CMAKE_CURRENT_BINARY_DIR}/../windows/${source}.rc)
-	IF(${source} MATCHES "nfc-mfreadblock")
+	IF(${source} MATCHES "nfc-mfblock")
 	  LIST(APPEND TARGETS mifare getopt )
     ENDIF()
 	IF(${source} MATCHES "nfc-st25tb")
